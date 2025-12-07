@@ -1,0 +1,27 @@
+# Scope definitions for the API Gateway
+# Each scope defines what endpoints it grants access to
+
+scopes:
+  - name: helloworld:read
+    description: Read access to the hello world endpoint
+    endpoints:
+      - path: /
+        methods: [GET]
+
+  - name: weatherforecast:read
+    description: Read access to weather forecast data
+    endpoints:
+      - path: /weatherforecast
+        methods: [GET]
+
+  - name: weatherforecast:write
+    description: Write access to weather forecast data
+    endpoints:
+      - path: /weatherforecast
+        methods: [POST, PUT, DELETE]
+
+  - name: api:full
+    description: Full access to all API endpoints
+    endpoints:
+      - path: /*
+        methods: [GET, POST, PUT, DELETE, PATCH]

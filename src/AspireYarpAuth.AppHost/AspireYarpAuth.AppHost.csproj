@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.0.0" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>c8bb31c9-7e5f-4c9e-9a9e-f9a3c9a9e9a9</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspireYarpAuth.Api\AspireYarpAuth.Api.csproj" />
+    <ProjectReference Include="..\AspireYarpAuth.Auth\AspireYarpAuth.Auth.csproj" />
+    <ProjectReference Include="..\AspireYarpAuth.Gateway\AspireYarpAuth.Gateway.csproj" />
+  </ItemGroup>
+
+</Project>

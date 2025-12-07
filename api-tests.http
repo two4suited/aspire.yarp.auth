@@ -1,0 +1,114 @@
+@authUrl = http://localhost:5100
+@gatewayUrl = http://localhost:5000
+
+### Get available scopes (from scopes.yml)
+GET {{authUrl}}/scopes
+
+### ---- Get tokens with different scopes ----
+
+### Get a token with helloworld:read scope
+# @name getHelloToken
+POST {{authUrl}}/token
+Content-Type: application/json
+
+{
+  "username": "demo-user",
+  "scopes": ["helloworld:read"]
+}
+
+### Get a token with weatherforecast:read scope
+# @name getWeatherToken
+POST {{authUrl}}/token
+Content-Type: application/json
+
+{
+  "username": "demo-user",
+  "scopes": ["weatherforecast:read"]
+}
+
+### Get a token with both scopes
+# @name getBothToken
+POST {{authUrl}}/token
+Content-Type: application/json
+
+{
+  "username": "demo-user",
+  "scopes": ["helloworld:read", "weatherforecast:read"]
+}
+
+### Get a token with full API access
+# @name getFullToken
+POST {{authUrl}}/token
+Content-Type: application/json
+
+{
+  "username": "admin-user",
+  "scopes": ["api:full"]
+}
+
+### ---- Test API calls through Gateway ----
+
+### Call hello endpoint with helloworld token (should succeed)
+@helloToken = {{getHelloToken.response.body.accessToken}}
+GET {{gatewayUrl}}/api/
+Authorization: Bearer {{helloToken}}
+
+### Call weatherforecast with helloworld token (should fail - 403)
+GET {{gatewayUrl}}/api/weatherforecast
+Authorization: Bearer {{helloToken}}
+
+### Call weatherforecast with weather token (should succeed)
+@weatherToken = {{getWeatherToken.response.body.accessToken}}
+GET {{gatewayUrl}}/api/weatherforecast
+Authorization: Bearer {{weatherToken}}
+
+### Call hello endpoint with weather token (should fail - 403)
+GET {{gatewayUrl}}/api/
+Authorization: Bearer {{weatherToken}}
+
+### Call both endpoints with combined token (should succeed)
+@bothToken = {{getBothToken.response.body.accessToken}}
+GET {{gatewayUrl}}/api/
+Authorization: Bearer {{bothToken}}
+
+###
+GET {{gatewayUrl}}/api/weatherforecast
+Authorization: Bearer {{bothToken}}
+
+### Call any endpoint with full access token (should succeed)
+@fullToken = {{getFullToken.response.body.accessToken}}
+GET {{gatewayUrl}}/api/
+Authorization: Bearer {{fullToken}}
+
+###
+GET {{gatewayUrl}}/api/weatherforecast
+Authorization: Bearer {{fullToken}}
+
+### ---- Error scenarios ----
+
+### Try to get a token with invalid scope
+POST {{authUrl}}/token
+Content-Type: application/json
+
+{
+  "username": "demo-user",
+  "scopes": ["invalid:scope"]
+}
+
+### Try to call API without any token (expect 401 Unauthorized)
+GET {{gatewayUrl}}/api/weatherforecast
+
+### Get a token with no scopes
+# @name getEmptyToken
+POST {{authUrl}}/token
+Content-Type: application/json
+
+{
+  "username": "demo-user",
+  "scopes": []
+}
+
+### Try to call API with token but no scopes (expect 403 Forbidden)
+@emptyToken = {{getEmptyToken.response.body.accessToken}}
+GET {{gatewayUrl}}/api/weatherforecast
+Authorization: Bearer {{emptyToken}}
